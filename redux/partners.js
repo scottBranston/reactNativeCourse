@@ -3,7 +3,7 @@ import * as ActionTypes from './ActionTypes';
 export const partners = (state = { isLoading: true,
                                     errMess: null,
                                     partners: []}, action) => {
-    switch (action.type) {
+    switch (action.type) { //mutating the state below, changes values within it with the state
         case ActionTypes.ADD_PARTNERS:
             return {...state, isLoading: false, errMess: null, partners: action.payload};
 
