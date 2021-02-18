@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Text, View, ScrollView, StyleSheet, Switch, Button, Picker, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Notifications from 'expo-notifications';
 import * as Animatable from 'react-native-animatable';
+import { TapGestureHandler } from 'react-native-gesture-handler';
 
 class Reservation extends Component {
 
@@ -37,7 +39,10 @@ class Reservation extends Component {
                 },
                 {
                     text: 'OK',
-                    onPress: () => console.log('OK Pressed')
+                    onPress: () => {
+                        this.presentLocalNotification(this.state.date.toLocaleDateString('en-US'));
+                        this.resetForm();
+                    }
                 }
             ],
             { cancelable: false }
@@ -52,6 +57,32 @@ class Reservation extends Component {
             showCalendar: false,
             showModal: false
         });
+    }
+
+    async presentLocalNotification(date) {              
+        function sendNotification() {
+            Notifications.setNotificationHandler({
+                handleNotification: async () => ({
+                    shouldShowAlert: true
+                })
+            });
+
+            Notifications.scheduleNotificationAsync({
+                content: {
+                    title: 'Your Campsite Reservation Search',
+                    body: `Search for ${date} requested`
+                },
+                trigger: null               //causes notification to fire immediately
+            });
+        }
+
+        let permissions = await Notifications.getPermissionsAsync();        //declare a variable, return to it the value of await Notifications.getPermissionsAsync()
+        if (!permissions.granted) {                                         //if we don't have permissions
+            permissions = await Notifications.requestPermissionsAsync();    //we request permissions
+        }
+        if (permissions.granted) {                                          //if we have permissions
+            sendNotification();                                             //execute sendNotification() function
+        }
     }
 
     render() {
